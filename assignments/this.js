@@ -25,6 +25,18 @@ car.start();
 
 // Principle 3
 // code example for New Binding
+function Shape(attributes){
+    this.sides=attributes.sides,
+    this.dimention=attributes.dimention,
+    this.hasRightAngles=attributes.hasRightAngles
+}
+
+const circle=new Shape({
+    sides:"round",
+   dimention:"2D",
+   hasRightAngles:false
+})
+console.log(circle);
 
 // Principle 4
 // code example for Explicit Binding
