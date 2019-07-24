@@ -40,3 +40,7 @@ console.log(circle);
 
 // Principle 4
 // code example for Explicit Binding
+function notCircle(){
+    console.log(`I'm ${this.sides} too!`);
+}
+notCircle.call(circle);
