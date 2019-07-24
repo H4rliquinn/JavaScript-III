@@ -15,14 +15,30 @@
   * dimensions (These represent the character's size in the video game)
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
+function GameObject(attr){
+  this.createdAt=attr.createdAt,
+  this.name=attr.name,
+  this.dimensions=attr.dimensions
+}
 
+GameObject.prototype.destroy=function(){
+  return `${this.name} was removed from the game`;
+};
 /*
   === CharacterStats ===
   * healthPoints
   * takeDamage() // prototype method -> returns the string '<object name> took damage.'
   * should inherit destroy() from GameObject's prototype
 */
-
+function CharacterStats(attr){
+  this.healthPoints=attr.healthPoints
+  GameObject.call(this,attr);
+  this.isChild=attr.isChild;
+}
+CharacterStats.prototype=Object.create(GameObject.prototype);
+CharacterStats.prototype.takeDamage=function(){
+  return `${this.name} took damage.`;
+}
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
   * team
@@ -32,17 +48,68 @@
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
- 
+
+function Humanoid(attr){
+  this.team=attr.team,
+  this.weapons=attr.weapons,
+  this.language=attr.language
+  CharacterStats.call(this,attr);
+  this.isChild=attr.isChild;
+}
+Humanoid.prototype=Object.create(CharacterStats.prototype);
+Humanoid.prototype.greet=function(){
+  return `${this.name} offers a greeting in ${this.language}`
+};
+
+
 /*
   * Inheritance chain: GameObject -> CharacterStats -> Humanoid
   * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
   * Instances of CharacterStats should have all of the same properties as GameObject.
 */
+function Hero(attr){
+  CharacterStats.call(this,attr);
+  this.isChild=attr.isChild;
+  
+  this.win=`{this.name} Grins smuggly.`;
+  this.lose=`{this.name} Weeps inconsoleably in defeat.`;
+  this.typeOfAttack=attr.typeOfAttack;
+}
+Hero.prototype=Object.create(Humanoid.prototype);
+Hero.prototype.attack=function(){
+  let attackType= roll(3);
+  console.log(this.typeOfAttack[attackType].damage);
+  let damage=roll(this.typeOfAttack[attackType].damage);
+  console.log(`${this.name} ${this.typeOfAttack[attackType].move} for ${damage}`);
+  mage.healthPoints-=damage;
+}
+
+function Villain(attr){
+  CharacterStats.call(this,attr);
+  this.isChild=attr.isChild;
+
+  this.win=`{this.name} Cackles maniacally`;
+  this.lose=`{this.name} Screams "I will return!`;
+  this.typeOfAttack=attr.typeOfAttack;
+}
+Villain.prototype=Object.create(Humanoid.prototype);
+Villain.prototype.attack=function(){
+  let attackType= roll(3);
+  let damage=roll(this.typeOfAttack[attackType].damage);
+  console.log(`${this.name} ${this.typeOfAttack[attackType].move} for ${damage}`);
+  swordsman.healthPoints-=damage;
+}
+
+//roll a die
+function roll(sides){
+  let result= Math.floor(Math.random() * (sides - 1)) + 1;
+  // console.log("!",result);
+  return result;
+}
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-/*
-  const mage = new Humanoid({
+  const mage = new Villain({
     createdAt: new Date(),
     dimensions: {
       length: 2,
@@ -56,9 +123,10 @@
       'Staff of Shamalama',
     ],
     language: 'Common Tongue',
+    typeOfAttack:[{move:"One word. Fireball",damage:6},{move:"Magic missle's the darkness",damage:4},{move:"Slaps with a fish",damage:2}]
   });
 
-  const swordsman = new Humanoid({
+  const swordsman = new Hero({
     createdAt: new Date(),
     dimensions: {
       length: 2,
@@ -73,6 +141,7 @@
       'Shield',
     ],
     language: 'Common Tongue',
+    typeOfAttack:[{move:"Slashes with his Giant Sword",damage:6},{move:"Shield bash",damage:4},{move:"Does an intinidating Boogie Woogie dance",damage:2}]
   });
 
   const archer = new Humanoid({
@@ -90,21 +159,40 @@
       'Dagger',
     ],
     language: 'Elvish',
+    typeOfAttack:[{move:"Fires a vicious fire arrow",damage:6},{move:"Stabs with a hidden blade",damage:4},{move:"Whacks with the bow",damage:2}]
   });
+  // console.log(mage.createdAt); // Today's date
+  // console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
+  // console.log(swordsman.healthPoints); // 15
+  // console.log(mage.name); // Bruce
+  // console.log(swordsman.team); // The Round Table
+  // console.log(mage.weapons); // Staff of Shamalama
+  // console.log(archer.language); // Elvish
+  // console.log(archer.greet()); // Lilith offers a greeting in Elvish.
+  // console.log(mage.takeDamage()); // Bruce took damage.
+  // console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
 
-  console.log(mage.createdAt); // Today's date
-  console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-  console.log(swordsman.healthPoints); // 15
-  console.log(mage.name); // Bruce
-  console.log(swordsman.team); // The Round Table
-  console.log(mage.weapons); // Staff of Shamalama
-  console.log(archer.language); // Elvish
-  console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-  console.log(mage.takeDamage()); // Bruce took damage.
-  console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-*/
 
   // Stretch task: 
   // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
   // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
   // * Create two new objects, one a villain and one a hero and fight it out with methods!
+
+  //The Arena
+
+  //Setup
+  let turnList=[swordsman, mage];
+  let currentPlayer={};
+  let flag=true;
+  let rounds=2;
+  let currRound=0;
+  // while (flag){
+
+  //START OF TURN
+    currentPlayer=turnList.shift();
+    console.log(currentPlayer.name+"'s turn");
+    currentPlayer.attack();
+    turnList.push(currentPlayer);
+  //END OF TURN
+    turnList.forEach(function(item){console.log(`${item.name} has ${item.healthPoints} healthPoints.`);});
+  // }

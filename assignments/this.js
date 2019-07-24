@@ -16,7 +16,7 @@ console.log(this);
 // Principle 2
 // code example for Implicit Binding
 let car={
-    noise:"Vroom!",
+    noise:"Vroom!!!",
     start:function(){
         console.log(this.noise);
     }
