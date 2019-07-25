@@ -71,25 +71,33 @@ function Hero(attr){
   CharacterStats.call(this,attr);
   this.isChild=attr.isChild;
   
-  this.win=`{this.name} Grins smuggly.`;
-  this.lose=`{this.name} Weeps inconsoleably in defeat.`;
+  this.win=`${this.name} Grins smuggly.`;
+  this.lose=`${this.name} Weeps inconsoleably in defeat.`;
   this.typeOfAttack=attr.typeOfAttack;
 }
 Hero.prototype=Object.create(Humanoid.prototype);
 Hero.prototype.attack=function(){
   let attackType= roll(3);
-  console.log(this.typeOfAttack[attackType].damage);
+  // console.log(this.typeOfAttack[attackType].damage);
   let damage=roll(this.typeOfAttack[attackType].damage);
   console.log(`${this.name} ${this.typeOfAttack[attackType].move} for ${damage}`);
-  mage.healthPoints-=damage;
+  // console.log("!!!SHeal",swordsman.healthPoints,"!!!MHeal",mage.healthPoints,"!!!DAM",damage);
+  mage.healthPoints=mage.healthPoints-damage;
+  // console.log("!!!SHeal",swordsman.healthPoints,"!!!MHeal",mage.healthPoints,"!!!DAM",damage);
+  if (mage.healthPoints<1){
+    flag=false;
+    return `${mage.name} was defeated! ${this.win}. ${mage.lose}.`;
+  } else{
+    return `${mage.name} took ${damage} damage.`;
+  }
 }
 
 function Villain(attr){
   CharacterStats.call(this,attr);
   this.isChild=attr.isChild;
 
-  this.win=`{this.name} Cackles maniacally`;
-  this.lose=`{this.name} Screams "I will return!`;
+  this.win=`${this.name} Cackles maniacally`;
+  this.lose=`${this.name} Screams "I will return!`;
   this.typeOfAttack=attr.typeOfAttack;
 }
 Villain.prototype=Object.create(Humanoid.prototype);
@@ -97,7 +105,15 @@ Villain.prototype.attack=function(){
   let attackType= roll(3);
   let damage=roll(this.typeOfAttack[attackType].damage);
   console.log(`${this.name} ${this.typeOfAttack[attackType].move} for ${damage}`);
-  swordsman.healthPoints-=damage;
+  // console.log("!!!SHeal",swordsman.healthPoints,"!!!MHeal",mage.healthPoints,"!!!DAM",damage);
+  swordsman.healthPoints=swordsman.healthPoints-damage;
+  // console.log("!!!SHeal",swordsman.healthPoints,"!!!MHeal",mage.healthPoints,"!!!DAM",damage);
+  if (swordsman.healthPoints<1){
+    flag=false;
+    return `${swordsman.name} was defeated! ${this.win}. ${swordsman.lose}.`;
+  } else{
+    return `${swordsman.name} took ${damage} damage.`;
+  }
 }
 
 //roll a die
@@ -123,7 +139,7 @@ function roll(sides){
       'Staff of Shamalama',
     ],
     language: 'Common Tongue',
-    typeOfAttack:[{move:"One word. Fireball",damage:6},{move:"Magic missle's the darkness",damage:4},{move:"Slaps with a fish",damage:2}]
+    typeOfAttack:[{move:"One word. Fireball",damage:30},{move:"Magic missle's the darkness",damage:10},{move:"Slaps with a fish",damage:2}]
   });
 
   const swordsman = new Hero({
@@ -141,7 +157,7 @@ function roll(sides){
       'Shield',
     ],
     language: 'Common Tongue',
-    typeOfAttack:[{move:"Slashes with his Giant Sword",damage:6},{move:"Shield bash",damage:4},{move:"Does an intinidating Boogie Woogie dance",damage:2}]
+    typeOfAttack:[{move:"Slashes with his Giant Sword",damage:6},{move:"Shield bashes",damage:2},{move:"Does an intinidating Boogie Woogie dance",damage:1}]
   });
 
   const archer = new Humanoid({
@@ -184,15 +200,21 @@ function roll(sides){
   let turnList=[swordsman, mage];
   let currentPlayer={};
   let flag=true;
-  let rounds=2;
+  let rounds=10;
   let currRound=0;
-  // while (flag){
 
+  //GET READY TO RUUUMMMMMBLLLLLLE!!!
+  while (flag){
+  if (currRound==rounds){flag=false;};
+  if (currRound>0){console.log("*** *** NEW ROUND:"+currRound+" *** ***")}
+  else {console.log("*** *** FIRST ROUND!!! *** ***")};
   //START OF TURN
     currentPlayer=turnList.shift();
     console.log(currentPlayer.name+"'s turn");
-    currentPlayer.attack();
+    console.log(currentPlayer.attack());
     turnList.push(currentPlayer);
   //END OF TURN
-    turnList.forEach(function(item){console.log(`${item.name} has ${item.healthPoints} healthPoints.`);});
-  // }
+    if (flag){turnList.forEach(function(item){console.log(`${item.name} has ${item.healthPoints} healthPoints.`);});};
+    
+    currRound++
+  }
